@@ -17,7 +17,7 @@ import BN from "bn.js";
 import { expect } from "chai";
 
 import { findMinerAddress, QuarrySDK } from "../src";
-import { QuarryMergeMineErrors } from "../src/idls/quarry_merge_mine";
+import { UquarryUmergeUmineErrors } from "../src/idls/quarry_merge_mine";
 import { createRewarderAndQuarry } from "./quarryUtils";
 import { DEFAULT_DECIMALS } from "./utils";
 import { makeSDK } from "./workspace";
@@ -87,11 +87,12 @@ describe("Quarry Merge Mine", () => {
       adminKP: ownerKP,
       annualRate: new u64(1_000_000000),
     });
-
+    // console.log("replicaA", replicaA)
     // init merge miner
     const poolData = await ownerSDK.mergeMine.program.account.mergePool.fetch(
       poolKey
     );
+    console.log("poolData", poolData)
     const { tx: initMMTX, key: mmKey } = await ownerSDK.mergeMine.newMM({
       pool: {
         key: poolKey,
@@ -396,7 +397,7 @@ describe("Quarry Merge Mine", () => {
     } catch (e) {
       const err = e as Error;
       expect(err.message).to.include(
-        `0x${QuarryMergeMineErrors.OutstandingReplicaTokens.code.toString(16)}`
+        `0x${UquarryUmergeUmineErrors.OutstandingReplicaTokens.code.toString(16)}`
       );
     }
   });

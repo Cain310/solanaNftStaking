@@ -1,7 +1,7 @@
-anchor_version = "0.18.0"
+anchor_version = "0.18.2"
 
 [scripts]
-test = "yarn ts-mocha -t 30000"
+test = "yarn ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
 
 [provider]
 cluster = "localnet"

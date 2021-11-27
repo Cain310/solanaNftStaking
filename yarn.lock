@@ -157,9 +157,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@project-serum/anchor@npm:^0.18.0":
-  version: 0.18.0
-  resolution: "@project-serum/anchor@npm:0.18.0"
+"@project-serum/anchor@npm:^0.18.2":
+  version: 0.18.2
+  resolution: "@project-serum/anchor@npm:0.18.2"
   dependencies:
     "@project-serum/borsh": ^0.2.2
     "@solana/web3.js": ^1.17.0
@@ -175,7 +175,7 @@ __metadata:
     pako: ^2.0.3
     snake-case: ^3.0.4
     toml: ^3.0.0
-  checksum: 9f83199f78a0bcd096e259ccfe3de6998a548b71f375e3cc61ce06aec65350edb222fdc93aeca64d9090278c7f2c458c2ab2e781b86f83700b3f1958518af32c
+  checksum: c97dcaf69892d0baaeeedc48fd91b6e1fbf8a61bbb21771ecf1b2129477c060d3eb79a0096a22f02a8bb4d1ac300f7eed3fa4ee4385a534ab1afcdb36fe89665
   languageName: node
   linkType: hard
 
@@ -195,7 +195,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@quarryprotocol/quarry-sdk@workspace:."
   dependencies:
-    "@project-serum/anchor": ^0.18.0
+    "@project-serum/anchor": ^0.18.2
     "@rushstack/eslint-patch": ^1.1.0
     "@saberhq/anchor-contrib": ^1.7.1
     "@saberhq/chai-solana": ^1.7.1

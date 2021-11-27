@@ -1,12 +1,12 @@
 import type { AnchorTypes } from "@saberhq/anchor-contrib";
 import type { PublicKey } from "@solana/web3.js";
 
-import type { QuarryMergeMineIDL } from "../idls/quarry_merge_mine";
+import type { UquarryUmergeUmineIDL } from "../idls/quarry_merge_mine";
 
 export * from "../idls/quarry_merge_mine";
 
 export type QuarryMergeMineTypes = AnchorTypes<
-  QuarryMergeMineIDL,
+UquarryUmergeUmineIDL,
   {
     mergePool: MergePoolData;
     mergeMiner: MergeMinerData;
