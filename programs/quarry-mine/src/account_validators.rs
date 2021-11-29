@@ -221,20 +221,19 @@ impl<'info> Validate<'info> for UserStake<'info> {
 
         // miner_vault
         assert_keys_eq!(self.miner.token_vault_key, self.miner_vault, "miner vault");
-        assert_keys_eq!(
-            self.miner_vault.mint,
-            self.quarry.token_mint_key,
-            "vault mint"
-        );
+        // assert_keys_eq!(
+        //     self.miner_vault.mint,
+        //     self.quarry.collection, // going to need to match freeze authorities here
+        //     "vault mint"
+        // );
         assert_keys_eq!(self.miner_vault.owner, self.miner, "vault owner");
 
 // token_account changed to update_authority_key
-// assert_keys_eq!(self.token_account.mint, self.quarry.update_authority_key,"update authority");
-        assert_keys_eq!(
-            self.token_account.mint,
-            self.quarry.token_mint_key,
-            "token mint"
-        );
+        // assert_keys_eq!(
+        //     self.token_account.mint,
+        //     self.quarry.collection,
+        //     "token mint"
+        // );
 
         // rewarder
         assert_keys_eq!(self.quarry.rewarder_key, self.rewarder, "rewarder");

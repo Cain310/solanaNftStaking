@@ -22,7 +22,7 @@ export class QuarryWrapper {
     /**
      * The token being staked.
      */
-    public readonly token: Token,
+    public readonly token: PublicKey,
     /**
      * The data of the rewarder.
      */
@@ -68,7 +68,7 @@ export class QuarryWrapper {
     /**
      * The token being staked.
      */
-    token: Token;
+    token: PublicKey;
   }): Promise<QuarryWrapper> {
     const program = sdk.programs.Mine;
     const quarryData = await program.account.quarry.fetch(key);
@@ -103,10 +103,14 @@ export class QuarryWrapper {
    * @param authority who owns the miner
    * @returns miner public key
    */
-  public async getMinerAddress(authority: PublicKey): Promise<PublicKey> {
+  public async getMinerAddress(
+    authority: PublicKey,
+    nonFungibleMint: PublicKey
+  ): Promise<PublicKey> {
     const [key] = await findMinerAddress(
       this.key,
       authority,
+      nonFungibleMint,
       this.program.programId
     );
     return key;
@@ -117,10 +121,13 @@ export class QuarryWrapper {
    * @param authority
    * @returns
    */
-  public async getMiner(authority: PublicKey): Promise<MinerData | null> {
+  public async getMiner(
+    authority: PublicKey,
+    nonFungibleMint: PublicKey
+  ): Promise<MinerData | null> {
     try {
       return await this.program.account.miner.fetch(
-        await this.getMinerAddress(authority)
+        await this.getMinerAddress(authority, nonFungibleMint)
       );
     } catch (e) {
       return null;
@@ -133,15 +140,16 @@ export class QuarryWrapper {
    * @returns
    */
   public async getMinerActions(
+    nonFungibleMint: PublicKey,
     authority: PublicKey = this.program.provider.wallet.publicKey
   ): Promise<MinerWrapper> {
-    const miner = await this.getMinerAddress(authority);
+    const miner = await this.getMinerAddress(authority, nonFungibleMint);
     const stakedTokenATA = await getATAAddress({
-      mint: this.quarryData.tokenMintKey,
+      mint: nonFungibleMint,
       owner: authority,
     });
     const tokenVaultKey = await getATAAddress({
-      mint: this.quarryData.tokenMintKey,
+      mint: nonFungibleMint,
       owner: miner,
     });
     return this.createMinerWrapper(
@@ -213,23 +221,26 @@ export class QuarryWrapper {
    * Creates the miner of the provided wallet.
    */
   public async createMiner({
+    nonFungibleMint,
     authority = this.program.provider.wallet.publicKey,
   }: {
+    nonFungibleMint: PublicKey;
     authority?: PublicKey;
-  } = {}): Promise<PendingMiner> {
+  }): Promise<PendingMiner> {
     const [miner, bump] = await findMinerAddress(
       this.key,
       authority,
+      nonFungibleMint,
       this.program.programId
     );
     const { address: minerVault, instruction: createATATX } =
       await getOrCreateATA({
         provider: this.provider,
-        mint: this.quarryData.tokenMintKey,
+        mint: nonFungibleMint,
         owner: miner,
       });
     const stakedTokenATA = await getATAAddress({
-      mint: this.quarryData.tokenMintKey,
+      mint: nonFungibleMint,
       owner: authority,
     });
     const wrapper = this.createMinerWrapper(
@@ -238,7 +249,7 @@ export class QuarryWrapper {
       minerVault,
       stakedTokenATA
     );
-    const result = wrapper.initialize(bump);
+    const result = wrapper.initialize(nonFungibleMint, bump);
     if (createATATX) {
       result.tx.instructions.unshift(createATATX);
     }

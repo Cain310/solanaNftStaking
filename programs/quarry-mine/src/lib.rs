@@ -172,8 +172,9 @@ pub mod quarry_mine {
         quarry.rewarder_key = *rewarder.to_account_info().key;
         quarry.annual_rewards_rate = 0;
         quarry.rewards_share = 0;
-        quarry.token_mint_decimals = ctx.accounts.token_mint.decimals;
-        quarry.token_mint_key = *ctx.accounts.token_mint.to_account_info().key;
+        quarry.token_mint_decimals = 0;
+        // quarry.token_mint_key = *ctx.accounts.token_mint.to_account_info().key;
+        quarry.collection = *ctx.accounts.collection.to_account_info().key; // this will be the nft collection creator address you will verify against
 
         let current_ts = Clock::get()?.unix_timestamp;
         emit!(QuarryCreateEvent {

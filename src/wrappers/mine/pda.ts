@@ -36,16 +36,29 @@ export const findQuarryAddress = async (
 export const findMinerAddress = async (
   quarry: PublicKey,
   authority: PublicKey,
+  nonFungibleMint?: PublicKey,
   // token_mint_key: PublicKey, idk maybe add this
   programID: PublicKey = QUARRY_ADDRESSES.Mine
 ): Promise<[PublicKey, number]> => {
-  return await PublicKey.findProgramAddress(
-    [
-      Buffer.from(utils.bytes.utf8.encode("Miner")),
-      quarry.toBytes(),
-      authority.toBytes(),
-      // token_mint_key.toBytes(), same as above
-    ],
-    programID
-  );
+  // ?? fix this
+  if (nonFungibleMint) {
+    return await PublicKey.findProgramAddress(
+      [
+        Buffer.from(utils.bytes.utf8.encode("Miner")),
+        quarry.toBytes(),
+        authority.toBytes(),
+        nonFungibleMint.toBytes(),
+      ],
+      programID
+    );
+  } else {
+    return await PublicKey.findProgramAddress(
+      [
+        Buffer.from(utils.bytes.utf8.encode("Miner")),
+        quarry.toBytes(),
+        authority.toBytes(),
+      ],
+      programID
+    );
+  }
 };

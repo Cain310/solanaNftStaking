@@ -1,6 +1,6 @@
 {
   "name": "@quarryprotocol/quarry-sdk",
-  "version": "1.10.5",
+  "version": "1.10.6",
   "description": "Quarry Protocol SDK",
   "keywords": [
     "solana",
@@ -31,12 +31,12 @@
   "devDependencies": {
     "@project-serum/anchor": "^0.18.2",
     "@rushstack/eslint-patch": "^1.1.0",
-    "@saberhq/anchor-contrib": "^1.9.0",
-    "@saberhq/chai-solana": "^1.9.0",
-    "@saberhq/eslint-config": "^1.9.0",
-    "@saberhq/solana-contrib": "^1.9.0",
-    "@saberhq/token-utils": "^1.9.0",
-    "@solana/spl-token-registry": "^0.2.469",
+    "@saberhq/anchor-contrib": "^1.10.1",
+    "@saberhq/chai-solana": "^1.10.1",
+    "@saberhq/eslint-config": "^1.10.1",
+    "@saberhq/solana-contrib": "^1.10.1",
+    "@saberhq/token-utils": "^1.10.1",
+    "@solana/spl-token-registry": "^0.2.499",
     "@solana/web3.js": "^1.31.0",
     "@types/bn.js": "^5.1.0",
     "@types/chai": "^4.2.22",
@@ -84,6 +84,7 @@
     "*.{js,json,jsx,html,css,md}": "prettier --write"
   },
   "dependencies": {
+    "@metaplex/js": "^4.4.1",
     "lodash.mapvalues": "^4.6.0",
     "tiny-invariant": "^1.2.0",
     "tslib": "^2.3.1"

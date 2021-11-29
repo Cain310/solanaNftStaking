@@ -60,7 +60,7 @@ export class MinerWrapper {
   /**
    * Creates the miner of the provided wallet.
    */
-  public initialize(bump: number): PendingMiner {
+  public initialize(nonFungibleMint: PublicKey, bump: number): PendingMiner {
     const instruction = this.program.instruction.createMiner(bump, {
       accounts: {
         authority: this.authority,
@@ -71,7 +71,7 @@ export class MinerWrapper {
         minerVault: this.tokenVaultKey,
         rewarder: this.quarry.quarryData.rewarderKey,
         tokenProgram: TOKEN_PROGRAM_ID,
-        tokenMint: this.quarry.token.mintAccount,
+        tokenMint: nonFungibleMint, // this needs to take in the nft mint
       },
     });
     return {
@@ -125,10 +125,12 @@ export class MinerWrapper {
     return new TransactionEnvelope(this.provider, [instruction]);
   }
 
-  private async getOrCreateStakedAssociatedTokenAccountInternal() {
+  private async getOrCreateStakedAssociatedTokenAccountInternal(
+    nonFungibleMint: PublicKey
+  ) {
     return await getOrCreateATA({
       provider: this.provider,
-      mint: this.quarry.token.mintAccount,
+      mint: nonFungibleMint, // this.quarry.token.mintAccount, // this needs to take in the nft mint,
       owner: this.authority,
     });
   }
@@ -136,9 +138,13 @@ export class MinerWrapper {
   /**
    * Creates the ATA of the user's staked token if it doesn't exist.
    */
-  public async createATAIfNotExists(): Promise<TransactionEnvelope | null> {
+  public async createATAIfNotExists(
+    nonFungibleMint: PublicKey
+  ): Promise<TransactionEnvelope | null> {
     const { instruction } =
-      await this.getOrCreateStakedAssociatedTokenAccountInternal();
+      await this.getOrCreateStakedAssociatedTokenAccountInternal(
+        nonFungibleMint
+      );
     if (!instruction) {
       return null;
     }

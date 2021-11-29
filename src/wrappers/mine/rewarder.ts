@@ -1,5 +1,5 @@
 import { TransactionEnvelope } from "@saberhq/solana-contrib";
-import type { Token, u64 } from "@saberhq/token-utils";
+import type { u64 } from "@saberhq/token-utils";
 import type { PublicKey, TransactionInstruction } from "@solana/web3.js";
 import { SystemProgram, SYSVAR_CLOCK_PUBKEY } from "@solana/web3.js";
 
@@ -28,7 +28,7 @@ export class RewarderWrapper {
    * @param token
    * @returns
    */
-  public async getQuarry(token: Token): Promise<QuarryWrapper> {
+  public async getQuarry(token: PublicKey): Promise<QuarryWrapper> {
     const quarryKey = await this.getQuarryKey(token);
     return await QuarryWrapper.load({
       sdk: this.sdk,
@@ -42,8 +42,8 @@ export class RewarderWrapper {
    * @param token
    * @returns
    */
-  async getQuarryKey(token: Token): Promise<PublicKey> {
-    return await this.getQuarryKeyForMint(token.mintAccount);
+  async getQuarryKey(token: PublicKey): Promise<PublicKey> {
+    return await this.getQuarryKeyForMint(token);
   }
 
   /**
@@ -66,21 +66,17 @@ export class RewarderWrapper {
    * @returns
    */
   public async createQuarry({
-    token,
-    nftMintUpdateAuthority,
+    collection,
     authority = this.program.provider.wallet.publicKey,
   }: {
-    token: Token;
-    nftMintUpdateAuthority?: PublicKey;
+    collection: PublicKey;
     authority?: PublicKey;
   }): Promise<PendingQuarry> {
     const [quarryKey, bump] = await findQuarryAddress(
       this.rewarderKey,
-      token.mintAccount,
-      this.program.programId,
-      nftMintUpdateAuthority
+      collection,
+      this.program.programId
     );
-    console.log("quarryKey, bump", quarryKey, bump);
     const ix = this.program.instruction.createQuarry(bump, {
       accounts: {
         quarry: quarryKey,
@@ -88,15 +84,12 @@ export class RewarderWrapper {
           authority,
           rewarder: this.rewarderKey,
         },
-        tokenMint: nftMintUpdateAuthority
-          ? nftMintUpdateAuthority
-          : token.mintAccount,
+        tokenMint: collection,
         payer: this.program.provider.wallet.publicKey,
         unusedClock: SYSVAR_CLOCK_PUBKEY,
         systemProgram: SystemProgram.programId,
       },
     });
-    console.log("ix", ix);
 
     return {
       rewarder: this.rewarderKey,
