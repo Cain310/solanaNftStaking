@@ -6,7 +6,7 @@ import type { UquarryUmergeUmineIDL } from "../idls/quarry_merge_mine";
 export * from "../idls/quarry_merge_mine";
 
 export type QuarryMergeMineTypes = AnchorTypes<
-UquarryUmergeUmineIDL,
+  UquarryUmergeUmineIDL,
   {
     mergePool: MergePoolData;
     mergeMiner: MergeMinerData;

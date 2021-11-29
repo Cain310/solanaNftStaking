@@ -38,12 +38,19 @@ import { makeSDK } from "./workspace";
 
 const ZERO = new BN(0);
 
+// GOAL: change mine/quarry filter param from mint to stakedMintAuthority
+
+// mocha cli.js --grep mine
 describe("Mine", () => {
   const { web3, BN } = anchor;
-
+  // console.log("web3", web3, BN);
+  // console.log("web3.keypair", web3.Keypair, BN);
   const DAILY_REWARDS_RATE = new BN(1_000 * web3.LAMPORTS_PER_SOL);
   const ANNUAL_REWARDS_RATE = DAILY_REWARDS_RATE.mul(new BN(365));
+  // console.log("DAILY_REWARDS_RATE", DAILY_REWARDS_RATE);
+  // console.log("ANNUAL_REWARDS_RATE", ANNUAL_REWARDS_RATE);
 
+  // authority over the mint and filter for quarry
   let stakedMintAuthority: anchor.web3.Keypair;
   let stakeTokenMint: anchor.web3.PublicKey;
   let stakeToken: Token;
@@ -55,24 +62,32 @@ describe("Mine", () => {
 
   before("Initialize SDK", () => {
     sdk = makeSDK();
+    // solana provider _rpcEndpoint: 'http://localhost:8899' etc...
     provider = sdk.provider;
+    // specify the mintWrapper program to test/use
     mintWrapper = sdk.mintWrapper;
+    // specify the mine program to test/use
     mine = sdk.mine;
   });
 
   before(async () => {
     await assert.doesNotReject(async () => {
+      // Generate a new random keypair
       stakedMintAuthority = web3.Keypair.generate();
+      // console.log("stakedMintAuthority", stakedMintAuthority);
+      // not sure if this works with nft's as it uses solana spl-token progran
       stakeTokenMint = await createMint(
         provider,
         stakedMintAuthority.publicKey,
         DEFAULT_DECIMALS
       );
+      // console.log("stakeTokenMint", stakeTokenMint);
     });
-
+    // Loads a token from a Mint
     stakeToken = Token.fromMint(stakeTokenMint, DEFAULT_DECIMALS, {
       name: "stake token",
     });
+    // console.log("stakeToken", stakeToken);
   });
 
   let rewardsMint: PublicKey;
@@ -83,13 +98,17 @@ describe("Mine", () => {
   beforeEach("Initialize mint", async () => {
     const rewardsMintKP = Keypair.generate();
     rewardsMint = rewardsMintKP.publicKey;
+    // console.log("rewardsMint", rewardsMint);
     token = Token.fromMint(rewardsMint, DEFAULT_DECIMALS);
+    // console.log("token", token);
     hardCap = TokenAmount.parse(token, DEFAULT_HARD_CAP.toString());
+    // console.log("hardCap", hardCap);
+    // newWrapper takes a mint and returns a mintWrapper keypair
     const { tx, mintWrapper: wrapperKey } = await mintWrapper.newWrapper({
       hardcap: hardCap.toU64(),
       tokenMint: rewardsMint,
     });
-
+    // console.log("wrapperKey", wrapperKey.toBase58());
     await expectTX(
       await createInitMintInstructions({
         provider,
@@ -101,6 +120,7 @@ describe("Mine", () => {
     ).to.be.fulfilled;
 
     mintWrapperKey = wrapperKey;
+    // console.log("line 105 mintWrapper", mintWrapperKey);
     await expectTX(tx, "Initialize mint").to.be.fulfilled;
   });
 
@@ -292,6 +312,7 @@ describe("Mine", () => {
         mintWrapper: mintWrapperKey,
         authority: provider.wallet.publicKey,
       });
+      // console.log("tx, theRewarderKey", tx, theRewarderKey);
       await expectTX(tx, "Create new rewarder").to.be.fulfilled;
       rewarderKey = theRewarderKey;
       rewarder = await mine.loadRewarderWrapper(rewarderKey);
@@ -299,22 +320,31 @@ describe("Mine", () => {
         await rewarder.setAndSyncAnnualRewards(ANNUAL_REWARDS_RATE, []),
         "set annual rewards"
       );
+      console.log("hereeeee");
     });
 
     describe("Single quarry", () => {
       beforeEach("Create a new quarry", async () => {
+        console.log(
+          "stakedMintAuthority.publicKey",
+          stakedMintAuthority.publicKey
+        );
         const { quarry, tx } = await rewarder.createQuarry({
           token: stakeToken,
+          nftMintUpdateAuthority: stakedMintAuthority.publicKey,
         });
+        console.log("quarry, tx", quarry, tx.instructions[0]);
         await expectTX(tx, "Create new quarry").to.be.fulfilled;
 
         const rewarderData = await mine.program.account.rewarder.fetch(
           rewarderKey
         );
+        console.log("rewarderData", rewarderData);
         assert.strictEqual(rewarderData.numQuarries, 1);
         const quarryAccountInfo = await provider.connection.getAccountInfo(
           quarry
         );
+        // console.log("Quarry account info", quarryAccountInfo);
         expect(quarryAccountInfo?.owner).to.eqAddress(mine.program.programId);
 
         assert.ok(quarryAccountInfo);
@@ -322,20 +352,29 @@ describe("Mine", () => {
           "Quarry",
           quarryAccountInfo.data
         );
+        // console.log("Quarry data", quarryData);
         assert.strictEqual(
           quarryData.famineTs.toString(),
           "9223372036854775807"
         );
+
+        // console.log("quarryData", quarryData);
+        // console.log("stakeTokenMint", stakeTokenMint);
         assert.strictEqual(
           quarryData.tokenMintKey.toBase58(),
           stakeTokenMint.toBase58()
         );
+        // console.log(
+        //   "quarryData.annualRewardsRate",
+        //   quarryData.annualRewardsRate
+        // );
+        // console.log("ZERO.toString()", ZERO.toString());
         assert.strictEqual(
           quarryData.annualRewardsRate.toString(),
           ZERO.toString()
         );
+        // console.log("quarryData.rewardsShare", quarryData.rewardsShare);
         assert.strictEqual(quarryData.rewardsShare.toString(), ZERO.toString());
-
         quarryKey = quarry;
       });
 
@@ -360,7 +399,7 @@ describe("Mine", () => {
         expect(rewarderData.totalRewardsShares.toString()).to.equal(
           quarryRewardsShare.toString()
         );
-
+        // console.log("Set rewards share stakeToken", stakeToken);
         const quarry = await rewarder.getQuarry(stakeToken);
         expect(quarry.key).to.eqAddress(quarryKey);
         expect(

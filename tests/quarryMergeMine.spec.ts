@@ -92,7 +92,7 @@ describe("Quarry Merge Mine", () => {
     const poolData = await ownerSDK.mergeMine.program.account.mergePool.fetch(
       poolKey
     );
-    console.log("poolData", poolData)
+
     const { tx: initMMTX, key: mmKey } = await ownerSDK.mergeMine.newMM({
       pool: {
         key: poolKey,

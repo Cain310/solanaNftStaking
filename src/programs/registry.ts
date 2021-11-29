@@ -1,11 +1,11 @@
 import type { AnchorTypes } from "@saberhq/anchor-contrib";
 
-import type { QuarryRegistryIDL } from "../idls/quarry_registry";
+import type { UquarryUregistryIDL } from "../idls/quarry_registry";
 
 export * from "../idls/quarry_registry";
 
 export type RegistryTypes = AnchorTypes<
-  QuarryRegistryIDL,
+  UquarryUregistryIDL,
   {
     registry: RegistryData;
   }

@@ -1,3 +1,4 @@
+
 //! Liquidity mining rewards distribution program.
 //!
 //! The program consists of three types of accounts:
@@ -18,7 +19,6 @@ use anchor_spl::token::Token;
 use anchor_spl::token::{self, Mint, TokenAccount, Transfer};
 use payroll::Payroll;
 use std::cmp;
-use vipers::assert_keys;
 use vipers::unwrap_int;
 use vipers::validate::Validate;
 
@@ -42,6 +42,8 @@ pub const DEFAULT_CLAIM_FEE_MILLIBPS: u64 = 1_000;
 /// Program for [quarry_mine].
 #[program]
 pub mod quarry_mine {
+    use vipers::assert_keys_eq;
+
     use super::*;
 
     /// --------------------------------
@@ -121,7 +123,7 @@ pub mod quarry_mine {
     pub fn accept_authority(ctx: Context<AcceptAuthority>) -> ProgramResult {
         let rewarder = &mut ctx.accounts.rewarder;
         let next_authority = rewarder.pending_authority;
-        assert_keys!(ctx.accounts.authority, next_authority, "pending authority");
+        assert_keys_eq!(ctx.accounts.authority, next_authority, "pending authority");
         rewarder.authority = next_authority;
         rewarder.pending_authority = Pubkey::default();
         Ok(())
@@ -1003,3 +1005,4 @@ pub enum ErrorCode {
     #[msg("Rewards earned exceeded quarry's upper bound.")]
     UpperboundExceeded,
 }
+

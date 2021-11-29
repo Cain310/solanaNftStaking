@@ -1,11 +1,11 @@
 import type { AnchorTypes } from "@saberhq/anchor-contrib";
 
-import type { QuarryMintWrapperIDL } from "../idls/quarry_mint_wrapper";
+import type { UquarryUmintUwrapperIDL } from "../idls/quarry_mint_wrapper";
 
 export * from "../idls/quarry_mint_wrapper";
 
 export type MintWrapperTypes = AnchorTypes<
-  QuarryMintWrapperIDL,
+  UquarryUmintUwrapperIDL,
   {
     mintWrapper: MintWrapperData;
     minter: MinterData;

@@ -3,12 +3,12 @@ import type { TransactionEnvelope } from "@saberhq/solana-contrib";
 import type { u64 } from "@saberhq/token-utils";
 import type { PublicKey } from "@solana/web3.js";
 
-import type { QuarryRedeemerIDL } from "../idls/quarry_redeemer";
+import type { UquarryUredeemerIDL } from "../idls/quarry_redeemer";
 
 export * from "../idls/quarry_redeemer";
 
 export type RedeemerTypes = AnchorTypes<
-  QuarryRedeemerIDL,
+  UquarryUredeemerIDL,
   {
     redeemer: RedeemerData;
   }

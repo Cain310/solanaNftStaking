@@ -1,11 +1,11 @@
 import type { AnchorTypes } from "@saberhq/anchor-contrib";
 
-import type { QuarryOperatorIDL } from "../idls/quarry_operator";
+import type { UquarryUoperatorIDL } from "../idls/quarry_operator";
 
 export * from "../idls/quarry_operator";
 
 export type QuarryOperatorTypes = AnchorTypes<
-  QuarryOperatorIDL,
+  UquarryUoperatorIDL,
   {
     operator: OperatorData;
   }

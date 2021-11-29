@@ -1,11 +1,11 @@
 import type { AnchorTypes } from "@saberhq/anchor-contrib";
 
-import type { QuarryMineIDL } from "../idls/quarry_mine";
+import type { UquarryUmineIDL } from "../idls/quarry_mine";
 
 export * from "../idls/quarry_mine";
 
 export type MineTypes = AnchorTypes<
-  QuarryMineIDL,
+  UquarryUmineIDL,
   {
     rewarder: RewarderData;
     quarry: QuarryData;

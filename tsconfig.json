@@ -15,5 +15,5 @@
     "lib": ["ES2019"],
     "importHelpers": true
   },
-  "include": ["src/", "tests/"]
+  "include": ["src/", "tests/", "target/types/buffer-layout.d.ts"]
 }

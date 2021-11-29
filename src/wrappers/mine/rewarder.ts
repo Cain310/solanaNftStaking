@@ -67,16 +67,20 @@ export class RewarderWrapper {
    */
   public async createQuarry({
     token,
+    nftMintUpdateAuthority,
     authority = this.program.provider.wallet.publicKey,
   }: {
     token: Token;
+    nftMintUpdateAuthority?: PublicKey;
     authority?: PublicKey;
   }): Promise<PendingQuarry> {
     const [quarryKey, bump] = await findQuarryAddress(
       this.rewarderKey,
       token.mintAccount,
-      this.program.programId
+      this.program.programId,
+      nftMintUpdateAuthority
     );
+    console.log("quarryKey, bump", quarryKey, bump);
     const ix = this.program.instruction.createQuarry(bump, {
       accounts: {
         quarry: quarryKey,
@@ -84,12 +88,15 @@ export class RewarderWrapper {
           authority,
           rewarder: this.rewarderKey,
         },
-        tokenMint: token.mintAccount,
+        tokenMint: nftMintUpdateAuthority
+          ? nftMintUpdateAuthority
+          : token.mintAccount,
         payer: this.program.provider.wallet.publicKey,
         unusedClock: SYSVAR_CLOCK_PUBKEY,
         systemProgram: SystemProgram.programId,
       },
     });
+    console.log("ix", ix);
 
     return {
       rewarder: this.rewarderKey,
