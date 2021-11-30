@@ -38,7 +38,8 @@ pub mod quarry_registry {
         ctx.accounts.validate()?;
         let quarry = &ctx.accounts.quarry;
         let registry = &mut ctx.accounts.registry;
-        registry.tokens[quarry.index as usize] = quarry.collection
+        // registry.tokens[quarry.index as usize] = quarry.update_authority_key;
+        registry.tokens[quarry.index as usize] = quarry.token_mint_key;
         Ok(())
     }
 }

@@ -5,14 +5,18 @@ import {
   createInitMintInstructions,
   createMint,
   getATAAddress,
+  getMintInfo,
   getTokenAccount,
+  mintNFT,
   sleep,
   Token,
   TokenAmount,
   u64,
   ZERO,
 } from "@saberhq/token-utils";
+import type { Keypair, PublicKey } from "@solana/web3.js";
 import { doesNotReject } from "assert";
+import * as assert from "assert";
 import { expect } from "chai";
 import invariant from "tiny-invariant";
 
@@ -27,7 +31,7 @@ import { QuarryWrapper } from "../src";
 import {
   DEFAULT_DECIMALS,
   DEFAULT_HARD_CAP,
-  newUserStakeTokenAccount,
+  // newUserStakeTokenAccount,
 } from "./utils";
 import { makeSDK } from "./workspace";
 
@@ -53,6 +57,42 @@ describe("Famine", () => {
   let token: Token;
   let mintWrapperKey: web3.PublicKey;
   let hardCap: TokenAmount;
+  let nonFungibleMint: Keypair;
+  // let stakeNonfungibleToken: Token;
+  let nonFungibleMintAnother: Keypair;
+  // let stakeAnotherNonfungibleToken: Token;
+  let freezeAuthority: PublicKey;
+
+  before("Create nonfunigble token", async () => {
+    await assert.doesNotReject(async () => {
+      nonFungibleMint = web3.Keypair.generate();
+      const tx = await mintNFT(provider, nonFungibleMint);
+      // Generate a new random keypair
+      await tx.send();
+      await tx.confirm();
+      // stakeNonfungibleToken = Token.fromMint(nonFungibleMint.publicKey, 0);
+      // console.log(stakeNonfungibleToken.toString());
+
+      nonFungibleMintAnother = web3.Keypair.generate();
+      const tx2 = await mintNFT(provider, nonFungibleMintAnother);
+      await tx2.send();
+      await tx2.confirm();
+      // stakeAnotherNonfungibleToken = Token.fromMint(
+      //   nonFungibleMintAnother.publicKey,
+      //   0
+      // );
+      const mintInfo = await getMintInfo(provider, nonFungibleMint.publicKey);
+      console.log(mintInfo);
+      const mintInfo2 = await getMintInfo(
+        provider,
+        nonFungibleMintAnother.publicKey
+      );
+      console.log(mintInfo2);
+
+      freezeAuthority = provider.wallet.publicKey; // simulating collection
+      console.log("freezeAuthority", freezeAuthority);
+    });
+  });
 
   beforeEach("Initialize rewards and stake mint", async () => {
     await doesNotReject(async () => {
@@ -125,119 +165,124 @@ describe("Famine", () => {
 
   beforeEach("Set up quarry and miner", async () => {
     const { quarry, tx: tx1 } = await rewarderWrapper.createQuarry({
-      token: stakeToken,
+      collection: provider.wallet.publicKey,
     });
     await expectTX(tx1, "Create new quarry").to.be.fulfilled;
     quarryWrapper = await QuarryWrapper.load({
       sdk,
-      token: stakeToken,
+      token: provider.wallet.publicKey,
       key: quarry,
     });
 
     // mint test tokens
-    await newUserStakeTokenAccount(
-      sdk,
-      quarryWrapper,
-      stakeToken,
-      stakedMintAuthority,
-      stakeAmount
-    );
+    // await newUserStakeTokenAccount(
+    //   sdk,
+    //   quarryWrapper,
+    //   stakeToken,
+    //   stakedMintAuthority,
+    //   stakeAmount
+    // );
 
     await expectTX(
       quarryWrapper.setRewardsShare(new u64(100)),
       "Set rewards share"
     ).to.be.fulfilled;
 
-    const { tx: tx2 } = await quarryWrapper.createMiner();
-    await expectTX(tx2, "Create new miner").to.be.fulfilled;
-  });
+    //   const { tx: tx2 } = await quarryWrapper.createMiner(
+    //     freezeAuthority,
+    //   );
+    //   await expectTX(tx2, "Create new miner").to.be.fulfilled;
+    // });
 
-  it("Stake and claim after famine", async () => {
-    const famine = new BN(Date.now() / 1000 - 5); // Rewards stopped 5 seconds ago
-    await expectTX(quarryWrapper.setFamine(famine), "Set famine");
+    it("Stake and claim after famine", async () => {
+      const famine = new BN(Date.now() / 1000 - 5); // Rewards stopped 5 seconds ago
+      await expectTX(quarryWrapper.setFamine(famine), "Set famine");
 
-    const minerActions = await quarryWrapper.getMinerActions(
-      provider.wallet.publicKey
-    );
-    await expectTX(
-      minerActions.stake(new TokenAmount(stakeToken, stakeAmount)),
-      "Stake into the quarry"
-    ).to.be.fulfilled;
+      const minerActions = await quarryWrapper.getMinerActions(
+        provider.wallet.publicKey
+      );
+      await expectTX(
+        minerActions.stake(new TokenAmount(stakeToken, stakeAmount)),
+        "Stake into the quarry"
+      ).to.be.fulfilled;
 
-    // Sleep for 5 seconds
-    await sleep(5000);
+      // Sleep for 5 seconds
+      await sleep(5000);
 
-    const tx = await minerActions.claim();
-    await expectTX(tx, "Claim from the quarry").to.be.fulfilled;
+      const tx = await minerActions.claim();
+      await expectTX(tx, "Claim from the quarry").to.be.fulfilled;
 
-    const rewardsTokenAccount = await getATAAddress({
-      mint: rewardsMint,
-      owner: provider.wallet.publicKey,
-    });
-    const rewardsTokenAccountInfo = await getTokenAccount(
-      provider,
-      rewardsTokenAccount
-    );
-    expect(rewardsTokenAccountInfo.amount.toString()).to.equal(ZERO.toString());
-  });
-
-  it("Stake before famine and claim after famine", async () => {
-    const minerActions = await quarryWrapper.getMinerActions(
-      provider.wallet.publicKey
-    );
-
-    const rewardsDuration = 5; // 5 seconds
-    const famine = new BN(Date.now() / 1000 + rewardsDuration);
-    await expectTX(
-      minerActions
-        .stake(new TokenAmount(stakeToken, stakeAmount))
-        .combine(quarryWrapper.setFamine(famine)),
-      "Set famine then stake tokens"
-    );
-
-    // Sleep for 8 seconds
-    await sleep(8000);
-
-    let tx = await minerActions.claim();
-    let claimSent = tx.send();
-    await expectTX(tx, "Claim from the quarry").to.be.fulfilled;
-    let receipt = await (await claimSent).wait();
-    receipt.printLogs();
-
-    const parser = new EventParser(
-      sdk.programs.Mine.programId,
-      sdk.programs.Mine.coder
-    );
-    const theParser = (logs: string[]) => {
-      const events: ClaimEvent[] = [];
-      parser.parseLogs(logs, (event) => {
-        events.push(event as ClaimEvent);
+      const rewardsTokenAccount = await getATAAddress({
+        mint: rewardsMint,
+        owner: provider.wallet.publicKey,
       });
-      return events;
-    };
-    let event = receipt.getEvents(theParser)[0];
-    invariant(event, "claim event not found");
+      const rewardsTokenAccountInfo = await getTokenAccount(
+        provider,
+        rewardsTokenAccount
+      );
+      expect(rewardsTokenAccountInfo.amount.toString()).to.equal(
+        ZERO.toString()
+      );
+    });
 
-    const expectedRewards = dailyRewardsRate
-      .div(new BN(86400))
-      .mul(new BN(rewardsDuration))
-      .add(new BN(2)); // error epsilon
-    expect(event.data.amount.toString()).to.be.oneOf([
-      expectedRewards.toString(),
-      "416", // XXX: Figure out this flaky case
-    ]);
+    it("Stake before famine and claim after famine", async () => {
+      const minerActions = await quarryWrapper.getMinerActions(
+        provider.wallet.publicKey
+      );
 
-    console.log("Claiming again after 5 seconds ...");
-    // Sleep for 5 seconds
-    await sleep(5000);
+      const rewardsDuration = 5; // 5 seconds
+      const famine = new BN(Date.now() / 1000 + rewardsDuration);
+      await expectTX(
+        minerActions
+          .stake(new TokenAmount(stakeToken, stakeAmount))
+          .combine(quarryWrapper.setFamine(famine)),
+        "Set famine then stake tokens"
+      );
 
-    tx = await minerActions.claim();
-    claimSent = tx.send();
-    await expectTX(tx, "Claim again from the quarry").to.be.fulfilled;
-    receipt = await (await claimSent).wait();
-    receipt.printLogs();
+      // Sleep for 8 seconds
+      await sleep(8000);
 
-    event = receipt.getEvents(theParser)[0];
-    expect(event).to.be.undefined; // No claim event
+      let tx = await minerActions.claim();
+      let claimSent = tx.send();
+      await expectTX(tx, "Claim from the quarry").to.be.fulfilled;
+      let receipt = await (await claimSent).wait();
+      receipt.printLogs();
+
+      const parser = new EventParser(
+        sdk.programs.Mine.programId,
+        sdk.programs.Mine.coder
+      );
+      const theParser = (logs: string[]) => {
+        const events: ClaimEvent[] = [];
+        parser.parseLogs(logs, (event) => {
+          events.push(event as ClaimEvent);
+        });
+        return events;
+      };
+      let event = receipt.getEvents(theParser)[0];
+      invariant(event, "claim event not found");
+
+      const expectedRewards = dailyRewardsRate
+        .div(new BN(86400))
+        .mul(new BN(rewardsDuration))
+        .add(new BN(2)); // error epsilon
+      expect(event.data.amount.toString()).to.be.oneOf([
+        expectedRewards.toString(),
+        "416", // XXX: Figure out this flaky case
+      ]);
+
+      console.log("Claiming again after 5 seconds ...");
+      // Sleep for 5 seconds
+      await sleep(5000);
+
+      tx = await minerActions.claim();
+      claimSent = tx.send();
+      await expectTX(tx, "Claim again from the quarry").to.be.fulfilled;
+      receipt = await (await claimSent).wait();
+      receipt.printLogs();
+
+      event = receipt.getEvents(theParser)[0];
+      expect(event).to.be.undefined; // No claim event
+    });
   });
 });
