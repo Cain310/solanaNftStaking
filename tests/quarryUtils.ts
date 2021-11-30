@@ -1,11 +1,21 @@
+import { web3 } from "@project-serum/anchor";
 import { expectTX } from "@saberhq/chai-solana";
+import type { Provider } from "@saberhq/solana-contrib";
 import { SignerWallet, SolanaProvider } from "@saberhq/solana-contrib";
-import { Token, u64 } from "@saberhq/token-utils";
+import { mintNFT, Token, u64 } from "@saberhq/token-utils";
 import type { Connection, PublicKey } from "@solana/web3.js";
 import { Keypair, LAMPORTS_PER_SOL } from "@solana/web3.js";
 
 import type { RewarderWrapper } from "../src";
 import { QuarrySDK, QuarryWrapper } from "../src";
+import { makeSDK } from "./workspace";
+
+let stakeNonfungibleToken: Token;
+let nonFungibleMint: Keypair;
+let provider: Provider;
+let sdk: QuarrySDK;
+// let mintWrapper: MintWrapper;
+// let mine: MineWrapper;
 
 export const createRewarderAndQuarry = async ({
   connection,
@@ -46,15 +56,29 @@ export const createRewarderAndQuarry = async ({
     }
   );
 
+  sdk = makeSDK();
+  // solana provider _rpcEndpoint: 'http://localhost:8899' etc...
+  provider = sdk.provider;
+  // specify the mintWrapper program to test/use
+  // mintWrapper = sdk.mintWrapper;
+  // // specify the mine program to test/use
+  // mine = sdk.mine;
+
+  nonFungibleMint = web3.Keypair.generate();
+  const tx = await mintNFT(provider, nonFungibleMint);
+  // Generate a new random keypair
+  await tx.send();
+  await tx.confirm();
+  stakeNonfungibleToken = Token.fromMint(nonFungibleMint.publicKey, 0);
   const { tx: createQuarryTX, quarry: quarryKey } =
     await rewarderW.createQuarry({
-      token: stakedToken,
+      stakeNonfungibleToken,
     });
   await expectTX(createQuarryTX, "Create quarry").to.be.fulfilled;
 
   const quarryW = await QuarryWrapper.load({
     sdk: quarrySDK,
-    token: stakedToken,
+    token: nonFungibleMint.publicKey,
     key: quarryKey,
   });
   const setShareTX = quarryW.setRewardsShare(new u64(1));

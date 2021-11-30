@@ -97,31 +97,34 @@ describe("Registry", () => {
     );
     await expectTX(setAnnualRewardsTX).eventually.to.be.fulfilled;
 
-    const { tx: createQuarryTX } = await rewarderWrapper.createQuarry({
-      token: stakeToken,
-    });
-    await expectTX(createQuarryTX, "create quarry for stake token").to.be
-      .fulfilled;
-  });
+    //   const { tx: createQuarryTX } = await rewarderWrapper.createQuarry({
+    //     token: stakeToken,
+    //   });
+    //   await expectTX(createQuarryTX, "create quarry for stake token").to.be
+    //     .fulfilled;
+    // });
 
-  it("create registry", async () => {
-    const { tx: createRegistryTX, registry } = await sdk.registry.newRegistry({
-      numQuarries: 100,
-      rewarderKey: rewarder,
-    });
-    await expectTX(createRegistryTX, "create registry").to.eventually.be
-      .fulfilled;
+    it("create registry", async () => {
+      const { tx: createRegistryTX, registry } = await sdk.registry.newRegistry(
+        {
+          numQuarries: 100,
+          rewarderKey: rewarder,
+        }
+      );
+      await expectTX(createRegistryTX, "create registry").to.eventually.be
+        .fulfilled;
 
-    const syncQuarryTX = await sdk.registry.syncQuarry({
-      tokenMint: stakeToken.mintAccount,
-      rewarderKey: rewarder,
-    });
-    await expectTX(syncQuarryTX, "sync quarry").to.eventually.be.fulfilled;
+      const syncQuarryTX = await sdk.registry.syncQuarry({
+        tokenMint: stakeToken.mintAccount,
+        rewarderKey: rewarder,
+      });
+      await expectTX(syncQuarryTX, "sync quarry").to.eventually.be.fulfilled;
 
-    console.log(
-      (await sdk.registry.program.account.registry.fetch(registry)).tokens.map(
-        (tok) => tok.toString()
-      )
-    );
+      console.log(
+        (
+          await sdk.registry.program.account.registry.fetch(registry)
+        ).tokens.map((tok) => tok.toString())
+      );
+    });
   });
 });

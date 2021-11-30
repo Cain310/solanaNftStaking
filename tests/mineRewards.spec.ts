@@ -5,29 +5,28 @@ import { expectTX } from "@saberhq/chai-solana";
 import type { Provider } from "@saberhq/solana-contrib";
 import {
   createInitMintInstructions,
-  createMint,
-  getATAAddress,
+  // createMint,
+  // getATAAddress,
   getMintInfo,
-  getTokenAccount,
+  // getTokenAccount,
   mintNFT,
   Token,
   TokenAmount,
-  u64,
+  // u64,
 } from "@saberhq/token-utils";
 import type { PublicKey } from "@solana/web3.js";
 import { Keypair, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import * as assert from "assert";
-import { BN } from "bn.js";
-import { expect } from "chai";
-import invariant from "tiny-invariant";
 
+// import { BN } from "bn.js";
+// import { expect } from "chai";
+// import invariant from "tiny-invariant";
 import type {
-  ClaimEvent,
+  // ClaimEvent,
   MineWrapper,
   MintWrapper,
   QuarrySDK,
   RewarderWrapper,
-  StakeEvent,
 } from "../src";
 import {
   DEFAULT_DECIMALS,
@@ -36,7 +35,7 @@ import {
 } from "./utils";
 import { makeSDK } from "./workspace";
 
-const ZERO = new BN(0);
+// const ZERO = new BN(0);
 
 describe("Mine Rewards", () => {
   const { web3, BN } = anchor;
@@ -44,7 +43,7 @@ describe("Mine Rewards", () => {
   const annualRewardsRate = dailyRewardsRate.mul(new BN(365));
 
   const rewardsShare = dailyRewardsRate.div(new BN(10));
-  const stakeAmount = 1_000_000000;
+  // const stakeAmount = 1_000_000000;
 
   let sdk: QuarrySDK;
   let provider: Provider;
@@ -53,12 +52,11 @@ describe("Mine Rewards", () => {
   let nonFungibleMint: Keypair;
   let stakeNonfungibleToken: Token;
   let nonFungibleMintAnother: Keypair;
-  let stakeAnotherNonfungibleToken: Token;
   let freezeAuthority: PublicKey;
 
-  let stakedMintAuthority: anchor.web3.Keypair;
-  let stakeTokenMint: anchor.web3.PublicKey;
-  let stakeToken: Token;
+  // let stakedMintAuthority: anchor.web3.Keypair;
+  // let stakeTokenMint: anchor.web3.PublicKey;
+  // let stakeToken: Token;
 
   let rewarder: PublicKey;
   let rewarderWrapper: RewarderWrapper;
@@ -131,15 +129,15 @@ describe("Mine Rewards", () => {
   });
 
   beforeEach(async () => {
-    stakedMintAuthority = Keypair.generate();
-    stakeTokenMint = await createMint(
-      provider,
-      stakedMintAuthority.publicKey,
-      DEFAULT_DECIMALS
-    );
-    stakeToken = Token.fromMint(stakeTokenMint, DEFAULT_DECIMALS, {
-      name: "stake token",
-    });
+    // stakedMintAuthority = Keypair.generate();
+    // stakeTokenMint = await createMint(
+    //   provider,
+    //   stakedMintAuthority.publicKey,
+    //   DEFAULT_DECIMALS
+    // );
+    // stakeToken = Token.fromMint(stakeTokenMint, DEFAULT_DECIMALS, {
+    //   name: "stake token",
+    // });
 
     const { tx: rewarderTx, key: rewarderKey } = await mine.createRewarder({
       mintWrapper: mintWrapperKey,
@@ -163,12 +161,12 @@ describe("Mine Rewards", () => {
     const quarryWrapper = await rewarderWrapper.getQuarry(
       nonFungibleMint.publicKey
     );
-    await expectTX(
-      (
-        await quarryWrapper.createMiner()
-      ).tx,
-      "create miner for user"
-    ).to.be.fulfilled;
+    // await expectTX(
+    //   (
+    //     await quarryWrapper.createMiner(stakeNonfungibleToken)
+    //   ).tx,
+    //   "create miner for user"
+    // ).to.be.fulfilled;
 
     await expectTX(
       quarryWrapper.setRewardsShare(rewardsShare),
@@ -185,122 +183,122 @@ describe("Mine Rewards", () => {
     // );
   });
 
-  it("#stake", async () => {
-    let quarry = await rewarderWrapper.getQuarry(stakeToken);
-    expect(quarry).to.exist;
-    const minerActions = await quarry.getMinerActions(
-      provider.wallet.publicKey
-    );
-    // stake into the quarry
-    const tx = minerActions.stake(new TokenAmount(stakeToken, stakeAmount));
-    const receipt = await (await tx.send()).wait();
+  // it("#stake", async () => {
+  //   let quarry = await rewarderWrapper.getQuarry(nonFungibleMint.publicKey);
+  //   expect(quarry).to.exist;
+  //   const minerActions = await quarry.getMinerActions(
+  //     provider.wallet.publicKey
+  //   );
+  //   // stake into the quarry
+  //   const tx = minerActions.stake(new TokenAmount(stakeNonfungibleToken, stakeAmount));
+  //   const receipt = await (await tx.send()).wait();
 
-    const parser = new anchor.EventParser(
-      sdk.programs.Mine.programId,
-      sdk.programs.Mine.coder
-    );
-    const theParser = (logs: string[]) => {
-      const events: StakeEvent[] = [];
-      parser.parseLogs(logs, (event) => {
-        events.push(event as StakeEvent);
-      });
-      return events;
-    };
-    const event = receipt.getEvents(theParser)[0];
+  //   const parser = new anchor.EventParser(
+  //     sdk.programs.Mine.programId,
+  //     sdk.programs.Mine.coder
+  //   );
+  //   const theParser = (logs: string[]) => {
+  //     const events: StakeEvent[] = [];
+  //     parser.parseLogs(logs, (event) => {
+  //       events.push(event as StakeEvent);
+  //     });
+  //     return events;
+  //   };
+  //   const event = receipt.getEvents(theParser)[0];
 
-    quarry = await rewarderWrapper.getQuarry(stakeToken);
-    // Checks
-    const payroll = quarry.payroll;
-    assert.ok(event);
-    const expectedRewardsPerTokenStored = payroll.calculateRewardPerToken(
-      event.data.timestamp
-    );
-    expect(quarry.quarryData.rewardsPerTokenStored.toString()).to.equal(
-      expectedRewardsPerTokenStored.toString()
-    );
-    const expectedRewardsRate = quarry.computeAnnualRewardsRate();
-    expect(quarry.quarryData.annualRewardsRate.toString()).to.equal(
-      expectedRewardsRate.toString()
-    );
-  });
+  //   quarry = await rewarderWrapper.getQuarry(nonFungibleMint.publicKey);
+  //   // Checks
+  //   const payroll = quarry.payroll;
+  //   assert.ok(event);
+  //   const expectedRewardsPerTokenStored = payroll.calculateRewardPerToken(
+  //     event.data.timestamp
+  //   );
+  //   expect(quarry.quarryData.rewardsPerTokenStored.toString()).to.equal(
+  //     expectedRewardsPerTokenStored.toString()
+  //   );
+  //   const expectedRewardsRate = quarry.computeAnnualRewardsRate();
+  //   expect(quarry.quarryData.annualRewardsRate.toString()).to.equal(
+  //     expectedRewardsRate.toString()
+  //   );
+  // });
 
-  it("#claim", async () => {
-    let quarry = await rewarderWrapper.getQuarry(stakeToken);
-    expect(quarry).to.exist;
-    let miner = await quarry.getMiner(provider.wallet.publicKey);
-    invariant(miner, "miner does not exist");
+  // it("#claim", async () => {
+  //   let quarry = await rewarderWrapper.getQuarry(nonFungibleMint.publicKey);
+  //   expect(quarry).to.exist;
+  //   let miner = await quarry.getMiner(stakeNonfungibleToken);
+  //   invariant(miner, "miner does not exist");
 
-    const minerActions = await quarry.getMinerActions(
-      provider.wallet.publicKey
-    );
+  //   const minerActions = await quarry.getMinerActions(
+  //     provider.wallet.publicKey
+  //   );
 
-    const stakeTx = minerActions.stake(
-      new TokenAmount(stakeToken, stakeAmount)
-    );
-    await expectTX(stakeTx, "Stake").to.be.fulfilled;
+  //   const stakeTx = minerActions.stake(
+  //     new TokenAmount(stakeToken, stakeAmount)
+  //   );
+  //   await expectTX(stakeTx, "Stake").to.be.fulfilled;
 
-    const wagesPerTokenPaid = miner.rewardsPerTokenPaid;
+  //   const wagesPerTokenPaid = miner.rewardsPerTokenPaid;
 
-    // whitelist rewarder
-    await expectTX(
-      mintWrapper.newMinterWithAllowance(
-        mintWrapperKey,
-        rewarder,
-        new u64(100_000_000_000000)
-      ),
-      "Minter add"
-    ).to.be.fulfilled;
+  //   // whitelist rewarder
+  //   await expectTX(
+  //     mintWrapper.newMinterWithAllowance(
+  //       mintWrapperKey,
+  //       rewarder,
+  //       new u64(100_000_000_000000)
+  //     ),
+  //     "Minter add"
+  //   ).to.be.fulfilled;
 
-    const tx = await minerActions.claim();
-    const claimSent = tx.send();
-    await expectTX(tx, "Claim").to.be.fulfilled;
-    const receipt = await (await claimSent).wait();
-    receipt.printLogs();
+  //   const tx = await minerActions.claim();
+  //   const claimSent = tx.send();
+  //   await expectTX(tx, "Claim").to.be.fulfilled;
+  //   const receipt = await (await claimSent).wait();
+  //   receipt.printLogs();
 
-    const parser = new anchor.EventParser(
-      sdk.programs.Mine.programId,
-      sdk.programs.Mine.coder
-    );
-    const theParser = (logs: string[]) => {
-      const events: ClaimEvent[] = [];
-      parser.parseLogs(logs, (event) => {
-        events.push(event as ClaimEvent);
-      });
-      return events;
-    };
-    const event = receipt.getEvents(theParser)[0];
-    assert.ok(event, "claim event not found");
+  //   const parser = new anchor.EventParser(
+  //     sdk.programs.Mine.programId,
+  //     sdk.programs.Mine.coder
+  //   );
+  //   const theParser = (logs: string[]) => {
+  //     const events: ClaimEvent[] = [];
+  //     parser.parseLogs(logs, (event) => {
+  //       events.push(event as ClaimEvent);
+  //     });
+  //     return events;
+  //   };
+  //   const event = receipt.getEvents(theParser)[0];
+  //   assert.ok(event, "claim event not found");
 
-    quarry = await rewarderWrapper.getQuarry(stakeToken);
-    miner = await quarry.getMiner(provider.wallet.publicKey);
-    invariant(miner, "miner must exist");
+  //   quarry = await rewarderWrapper.getQuarry(stakeToken);
+  //   miner = await quarry.getMiner(provider.wallet.publicKey);
+  //   invariant(miner, "miner must exist");
 
-    // Checks
-    const payroll = quarry.payroll;
-    const expectedWagesEarned = payroll.calculateRewardsEarned(
-      event.data.timestamp,
-      new BN(stakeAmount),
-      wagesPerTokenPaid,
-      ZERO
-    );
+  //   // Checks
+  //   const payroll = quarry.payroll;
+  //   const expectedWagesEarned = payroll.calculateRewardsEarned(
+  //     event.data.timestamp,
+  //     new BN(stakeAmount),
+  //     wagesPerTokenPaid,
+  //     ZERO
+  //   );
 
-    const fees = expectedWagesEarned.mul(new BN(1)).div(new BN(10_000));
-    const rewardsAfterFees = expectedWagesEarned.sub(fees);
+  //   const fees = expectedWagesEarned.mul(new BN(1)).div(new BN(10_000));
+  //   const rewardsAfterFees = expectedWagesEarned.sub(fees);
 
-    expect(event.data.amount.isZero()).to.be.false;
-    expect(event.data.amount).to.bignumber.eq(rewardsAfterFees);
-    expect(event.data.fees).to.bignumber.eq(fees);
-    expect(miner.rewardsEarned.toString()).to.equal(ZERO.toString());
-    const rewardsTokenAccount = await getATAAddress({
-      mint: rewardsMint,
-      owner: provider.wallet.publicKey,
-    });
-    const rewardsTokenAccountInfo = await getTokenAccount(
-      provider,
-      rewardsTokenAccount
-    );
-    expect(rewardsTokenAccountInfo.amount.toString()).to.equal(
-      event.data.amount.toString()
-    );
-  });
+  //   expect(event.data.amount.isZero()).to.be.false;
+  //   expect(event.data.amount).to.bignumber.eq(rewardsAfterFees);
+  //   expect(event.data.fees).to.bignumber.eq(fees);
+  //   expect(miner.rewardsEarned.toString()).to.equal(ZERO.toString());
+  //   const rewardsTokenAccount = await getATAAddress({
+  //     mint: rewardsMint,
+  //     owner: provider.wallet.publicKey,
+  //   });
+  //   const rewardsTokenAccountInfo = await getTokenAccount(
+  //     provider,
+  //     rewardsTokenAccount
+  //   );
+  //   expect(rewardsTokenAccountInfo.amount.toString()).to.equal(
+  //     event.data.amount.toString()
+  //   );
+  // });
 });
