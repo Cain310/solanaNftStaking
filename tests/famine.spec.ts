@@ -165,7 +165,7 @@ describe("Famine", () => {
 
   beforeEach("Set up quarry and miner", async () => {
     const { quarry, tx: tx1 } = await rewarderWrapper.createQuarry({
-      collection: provider.wallet.publicKey,
+      updateAuthority: provider.wallet.publicKey,
     });
     await expectTX(tx1, "Create new quarry").to.be.fulfilled;
     quarryWrapper = await QuarryWrapper.load({

@@ -66,15 +66,15 @@ export class RewarderWrapper {
    * @returns
    */
   public async createQuarry({
-    collection,
+    updateAuthority,
     authority = this.program.provider.wallet.publicKey,
   }: {
-    collection: PublicKey;
+    updateAuthority: PublicKey;
     authority?: PublicKey;
   }): Promise<PendingQuarry> {
     const [quarryKey, bump] = await findQuarryAddress(
       this.rewarderKey,
-      collection,
+      updateAuthority,
       this.program.programId
     );
     const ix = this.program.instruction.createQuarry(bump, {
@@ -84,7 +84,7 @@ export class RewarderWrapper {
           authority,
           rewarder: this.rewarderKey,
         },
-        tokenMint: collection,
+        tokenMint: updateAuthority,
         payer: this.program.provider.wallet.publicKey,
         unusedClock: SYSVAR_CLOCK_PUBKEY,
         systemProgram: SystemProgram.programId,
