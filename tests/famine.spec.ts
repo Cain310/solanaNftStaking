@@ -58,7 +58,7 @@ describe("Famine", () => {
   let mintWrapperKey: web3.PublicKey;
   let hardCap: TokenAmount;
   let nonFungibleMint: Keypair;
-  // let stakeNonfungibleToken: Token;
+  let stakeNonfungibleToken: Token;
   let nonFungibleMintAnother: Keypair;
   // let stakeAnotherNonfungibleToken: Token;
   let freezeAuthority: PublicKey;
@@ -70,7 +70,7 @@ describe("Famine", () => {
       // Generate a new random keypair
       await tx.send();
       await tx.confirm();
-      // stakeNonfungibleToken = Token.fromMint(nonFungibleMint.publicKey, 0);
+      stakeNonfungibleToken = Token.fromMint(nonFungibleMint.publicKey, 0);
       // console.log(stakeNonfungibleToken.toString());
 
       nonFungibleMintAnother = web3.Keypair.generate();
@@ -165,7 +165,7 @@ describe("Famine", () => {
 
   beforeEach("Set up quarry and miner", async () => {
     const { quarry, tx: tx1 } = await rewarderWrapper.createQuarry({
-      updateAuthority: provider.wallet.publicKey,
+      stakeNonfungibleToken,
     });
     await expectTX(tx1, "Create new quarry").to.be.fulfilled;
     quarryWrapper = await QuarryWrapper.load({

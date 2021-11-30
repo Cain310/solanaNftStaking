@@ -173,7 +173,7 @@ pub mod quarry_mine {
         quarry.annual_rewards_rate = 0;
         quarry.rewards_share = 0;
         quarry.token_mint_decimals = ctx.accounts.token_mint.decimals;
-        quarry.token_mint_key = *ctx.accounts.update_authority.to_account_info().key;
+        quarry.token_mint_key = *ctx.accounts.token_mint.to_account_info().key;
 
         let current_ts = Clock::get()?.unix_timestamp;
         emit!(QuarryCreateEvent {
@@ -638,7 +638,7 @@ pub struct CreateQuarry<'info> {
             b"Quarry".as_ref(),
             auth.rewarder.key().to_bytes().as_ref(),
             token_mint.key().to_bytes().as_ref(),
-            update_authority.key().to_bytes().as_ref()
+            // update_authority.key().to_bytes().as_ref()
         ],
         bump = bump,
         payer = payer
@@ -651,7 +651,7 @@ pub struct CreateQuarry<'info> {
     /// [Mint] of the token to create a [Quarry] for.
     pub token_mint: Account<'info, Mint>,
 
-    pub update_authority: Account<'info, Mint>,
+    // pub update_authority: Account<'info, Mint>,
 
     /// Payer of [Quarry] creation.
     #[account(mut)]

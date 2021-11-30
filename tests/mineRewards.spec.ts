@@ -7,7 +7,9 @@ import {
   createInitMintInstructions,
   createMint,
   getATAAddress,
+  getMintInfo,
   getTokenAccount,
+  mintNFT,
   Token,
   TokenAmount,
   u64,
@@ -30,13 +32,14 @@ import type {
 import {
   DEFAULT_DECIMALS,
   DEFAULT_HARD_CAP,
-  newUserStakeTokenAccount,
+  // newUserStakeTokenAccount,
 } from "./utils";
 import { makeSDK } from "./workspace";
 
 const ZERO = new BN(0);
 
 describe("Mine Rewards", () => {
+  const { web3, BN } = anchor;
   const dailyRewardsRate = new BN(1_000 * LAMPORTS_PER_SOL);
   const annualRewardsRate = dailyRewardsRate.mul(new BN(365));
 
@@ -47,6 +50,11 @@ describe("Mine Rewards", () => {
   let provider: Provider;
   let mintWrapper: MintWrapper;
   let mine: MineWrapper;
+  let nonFungibleMint: Keypair;
+  let stakeNonfungibleToken: Token;
+  let nonFungibleMintAnother: Keypair;
+  let stakeAnotherNonfungibleToken: Token;
+  let freezeAuthority: PublicKey;
 
   let stakedMintAuthority: anchor.web3.Keypair;
   let stakeTokenMint: anchor.web3.PublicKey;
@@ -66,6 +74,37 @@ describe("Mine Rewards", () => {
   let token: Token;
   let mintWrapperKey: PublicKey;
   let hardCap: TokenAmount;
+
+  before("Create nonfunigble token", async () => {
+    await assert.doesNotReject(async () => {
+      nonFungibleMint = web3.Keypair.generate();
+      const tx = await mintNFT(provider, nonFungibleMint);
+      // Generate a new random keypair
+      await tx.send();
+      await tx.confirm();
+      stakeNonfungibleToken = Token.fromMint(nonFungibleMint.publicKey, 0);
+      // console.log(stakeNonfungibleToken.toString());
+
+      nonFungibleMintAnother = web3.Keypair.generate();
+      const tx2 = await mintNFT(provider, nonFungibleMintAnother);
+      await tx2.send();
+      await tx2.confirm();
+      // stakeAnotherNonfungibleToken = Token.fromMint(
+      //   nonFungibleMintAnother.publicKey,
+      //   0
+      // );
+      const mintInfo = await getMintInfo(provider, nonFungibleMint.publicKey);
+      console.log(mintInfo);
+      const mintInfo2 = await getMintInfo(
+        provider,
+        nonFungibleMintAnother.publicKey
+      );
+      console.log(mintInfo2);
+
+      freezeAuthority = provider.wallet.publicKey; // simulating collection
+      console.log("freezeAuthority", freezeAuthority);
+    });
+  });
 
   beforeEach("Initialize mint", async () => {
     const rewardsMintKP = Keypair.generate();
@@ -117,11 +156,13 @@ describe("Mine Rewards", () => {
     await expectTX(setAnnualRewardsTX).eventually.to.be.fulfilled;
 
     const { tx: createQuarryTX } = await rewarderWrapper.createQuarry({
-      token: stakeToken,
+      stakeNonfungibleToken,
     });
     await expectTX(createQuarryTX, "create quarry for stake token").to.be
       .fulfilled;
-    const quarryWrapper = await rewarderWrapper.getQuarry(stakeToken);
+    const quarryWrapper = await rewarderWrapper.getQuarry(
+      nonFungibleMint.publicKey
+    );
     await expectTX(
       (
         await quarryWrapper.createMiner()
@@ -135,13 +176,13 @@ describe("Mine Rewards", () => {
     ).to.be.fulfilled;
 
     // mint test tokens
-    await newUserStakeTokenAccount(
-      sdk,
-      await rewarderWrapper.getQuarry(stakeToken),
-      stakeToken,
-      stakedMintAuthority,
-      stakeAmount
-    );
+    // await newUserStakeTokenAccount(
+    //   sdk,
+    //   await rewarderWrapper.getQuarry(stakeToken),
+    //   stakeToken,
+    //   stakedMintAuthority,
+    //   stakeAmount
+    // );
   });
 
   it("#stake", async () => {

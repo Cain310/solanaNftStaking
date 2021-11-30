@@ -119,8 +119,8 @@ pub mod quarry_operator {
                 quarry_mine::cpi::accounts::CreateQuarry {
                     quarry: ctx.accounts.quarry.to_account_info(),
                     auth: ctx.accounts.with_delegate.to_auth_accounts(),
-                    update_authority: ctx.accounts.update_authority.to_account_info(),
-                    token_mint: ctx.accounts.update_authority.to_account_info(),
+                    // update_authority: ctx.accounts.update_authority.to_account_info(),
+                    token_mint: ctx.accounts.token_mint.to_account_info(),
                     payer: ctx.accounts.payer.to_account_info(),
                     unused_clock: ctx.accounts.unused_clock.to_account_info(),
                     system_program: ctx.accounts.system_program.to_account_info(),
@@ -279,7 +279,7 @@ pub struct DelegateCreateQuarry<'info> {
     pub with_delegate: WithDelegate<'info>,
     #[account(mut)]
     pub quarry: UncheckedAccount<'info>,
-    pub update_authority: UncheckedAccount<'info>,
+    // pub update_authority: UncheckedAccount<'info>,
     pub token_mint: Box<Account<'info, anchor_spl::token::Mint>>,
 
     /// Payer of [Quarry] creation.

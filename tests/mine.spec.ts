@@ -83,7 +83,7 @@ describe("Mine", () => {
         stakedMintAuthority.publicKey,
         DEFAULT_DECIMALS
       );
-      // console.log("stakeTokenMint", stakeTokenMint);
+      console.log("stakeTokenMint", stakeTokenMint);
     });
     // Loads a token from a Mint
     stakeToken = Token.fromMint(stakeTokenMint, DEFAULT_DECIMALS, {
@@ -176,7 +176,7 @@ describe("Mine", () => {
       ).to.be.fulfilled;
 
       const { quarry, tx: quarryTx } = await rewarder.createQuarry({
-        collection: provider.wallet.publicKey, // the mint
+        stakeNonfungibleToken, // the mint
       });
 
       quarryKey = quarry;
