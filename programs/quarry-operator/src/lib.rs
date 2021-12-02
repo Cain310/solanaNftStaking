@@ -281,6 +281,7 @@ pub struct DelegateCreateQuarry<'info> {
     pub quarry: UncheckedAccount<'info>,
     // pub update_authority: UncheckedAccount<'info>,
     pub token_mint: Box<Account<'info, anchor_spl::token::Mint>>,
+    // pub update_authority: UncheckedAccount<'info>,
 
     /// Payer of [Quarry] creation.
     #[account(mut)]

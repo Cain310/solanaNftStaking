@@ -53,6 +53,7 @@ describe("Mine", () => {
   let mintWrapper: MintWrapper;
   let mine: MineWrapper;
   let nonFungibleMint: Keypair;
+  let mintAuthority: PublicKey;
   let stakeNonfungibleToken: Token;
   let nonFungibleMintAnother: Keypair;
   let stakeAnotherNonfungibleToken: Token;
@@ -88,12 +89,13 @@ describe("Mine", () => {
   before("Create nonfunigble token", async () => {
     await assert.doesNotReject(async () => {
       nonFungibleMint = web3.Keypair.generate();
+      mintAuthority = nonFungibleMint.publicKey;
       const tx = await mintNFT(provider, nonFungibleMint);
       // Generate a new random keypair
       await tx.send();
       await tx.confirm();
       stakeNonfungibleToken = Token.fromMint(nonFungibleMint.publicKey, 0);
-
+      console.log(stakeNonfungibleToken.toString());
       nonFungibleMintAnother = web3.Keypair.generate();
       const tx2 = await mintNFT(provider, nonFungibleMintAnother);
       await tx2.send();
@@ -153,26 +155,35 @@ describe("Mine", () => {
         mintWrapper: mintWrapperKey,
         authority: provider.wallet.publicKey,
       });
+      // console.log("theReward÷erKey", theRewarderKey, tx);
       await expectTX(tx, "Create new rewarder").to.be.fulfilled;
       rewarderKey = theRewarderKey;
       rewarder = await mine.loadRewarderWrapper(rewarderKey);
       await expectTX(
         await rewarder.setAndSyncAnnualRewards(ANNUAL_REWARDS_RATE, [])
       ).to.be.fulfilled;
-
+      console.log("stakeNonfungibleToken", stakeNonfungibleToken);
       const { quarry, tx: quarryTx } = await rewarder.createQuarry({
-        stakeNonfungibleToken, // the mint
+        mintAuthority, // the mint
       });
-
       quarryKey = quarry;
 
+      // console.log(
+      //   "quarryKey1",
+      //   JSON.stringify(quarryKey, null, 4),
+      //   typeof quarryKey
+      // );
+      // console.log("quarryTx", quarryTx, typeof quarryTx);
+
       await expectTX(quarryTx, "Create new quarry").to.be.fulfilled;
+
+      console.log("quarryKey", quarryKey);
     });
 
     beforeEach("Create miner", async () => {
       quarry = await rewarder.getQuarry(provider.wallet.publicKey); // passing the expected "collection value"
+      console.log("quarryyyyyy", quarry);
       expect(quarry).to.exist;
-
       // create the miner
       await expectTX(
         (
@@ -199,7 +210,9 @@ describe("Mine", () => {
         provider.wallet.publicKey,
         nonFungibleMint.publicKey
       );
+      // console.log("miner", miner);
       const minerAccountInfo = await provider.connection.getAccountInfo(miner);
+      // console.log("minerAccountInfo", minerAccountInfo);
       expect(minerAccountInfo?.owner).to.eqAddress(mine.program.programId);
       assert.ok(minerAccountInfo?.data);
       const minerData = mine.program.coder.accounts.decode<MinerData>(

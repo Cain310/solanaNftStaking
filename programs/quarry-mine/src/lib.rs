@@ -256,6 +256,7 @@ pub mod quarry_mine {
         miner.bump = bump;
         miner.quarry_key = ctx.accounts.quarry.key();
         miner.token_vault_key = ctx.accounts.miner_vault.key();
+        miner.token_mint_key = *ctx.accounts.token_mint.to_account_info().key;
         miner.rewards_earned = 0;
         miner.rewards_per_token_paid = 0;
         miner.balance = 0;
@@ -264,6 +265,7 @@ pub mod quarry_mine {
         emit!(MinerCreateEvent {
             authority: miner.authority,
             quarry: miner.quarry_key,
+            token_mint: miner.token_mint_key,
             miner: miner.key(),
         });
 
@@ -493,8 +495,11 @@ pub struct Miner {
     /// Bump.
     pub bump: u8,
 
-    /// [TokenAccount] to hold the [Miner]'s staked LP tokens.
+    /// [TokenAccount] to hold the [Miner]'s staked NFT tokens.
     pub token_vault_key: Pubkey,
+
+    /// [Mint] of [Miner]'s NFT tokens.
+    pub token_mint_key: Pubkey,
 
     /// Stores the amount of tokens that the [Miner] may claim.
     /// Whenever the [Miner] claims tokens, this is reset to 0.
@@ -651,7 +656,7 @@ pub struct CreateQuarry<'info> {
     /// [Mint] of the token to create a [Quarry] for.
     pub token_mint: Account<'info, Mint>,
 
-    // pub update_authority: Account<'info, Mint>,
+    // pub update_authority: UncheckedAccount<'info>,
 
     /// Payer of [Quarry] creation.
     #[account(mut)]
@@ -952,6 +957,9 @@ pub struct MinerCreateEvent {
     /// Quarry the miner was created on.
     #[index]
     pub quarry: Pubkey,
+    /// NFT the miner is created for.
+    #[index]
+    token_mint: Pubkey,
     /// The [Miner].
     pub miner: Pubkey,
 }

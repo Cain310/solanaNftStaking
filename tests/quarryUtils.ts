@@ -14,6 +14,7 @@ let stakeNonfungibleToken: Token;
 let nonFungibleMint: Keypair;
 let provider: Provider;
 let sdk: QuarrySDK;
+let mintAuthority: PublicKey;
 // let mintWrapper: MintWrapper;
 // let mine: MineWrapper;
 
@@ -63,16 +64,20 @@ export const createRewarderAndQuarry = async ({
   // mintWrapper = sdk.mintWrapper;
   // // specify the mine program to test/use
   // mine = sdk.mine;
-
   nonFungibleMint = web3.Keypair.generate();
+  mintAuthority = nonFungibleMint.publicKey;
   const tx = await mintNFT(provider, nonFungibleMint);
   // Generate a new random keypair
   await tx.send();
   await tx.confirm();
   stakeNonfungibleToken = Token.fromMint(nonFungibleMint.publicKey, 0);
+  console.log(
+    "stakeNonfungibleToken mineRewardeer",
+    stakeNonfungibleToken.toString()
+  );
   const { tx: createQuarryTX, quarry: quarryKey } =
     await rewarderW.createQuarry({
-      stakeNonfungibleToken,
+      mintAuthority,
     });
   await expectTX(createQuarryTX, "Create quarry").to.be.fulfilled;
 

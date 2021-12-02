@@ -1,5 +1,5 @@
 import { TransactionEnvelope } from "@saberhq/solana-contrib";
-import type { Token, u64 } from "@saberhq/token-utils";
+import type { u64 } from "@saberhq/token-utils";
 import type { PublicKey, TransactionInstruction } from "@solana/web3.js";
 import { SystemProgram, SYSVAR_CLOCK_PUBKEY } from "@solana/web3.js";
 
@@ -66,15 +66,15 @@ export class RewarderWrapper {
    * @returns
    */
   public async createQuarry({
-    stakeNonfungibleToken,
+    mintAuthority,
     authority = this.program.provider.wallet.publicKey,
   }: {
-    stakeNonfungibleToken: Token;
+    mintAuthority: PublicKey;
     authority?: PublicKey;
   }): Promise<PendingQuarry> {
     const [quarryKey, bump] = await findQuarryAddress(
       this.rewarderKey,
-      stakeNonfungibleToken.mintAccount,
+      mintAuthority,
       this.program.programId
     );
     const ix = this.program.instruction.createQuarry(bump, {
@@ -84,7 +84,7 @@ export class RewarderWrapper {
           authority,
           rewarder: this.rewarderKey,
         },
-        tokenMint: stakeNonfungibleToken.mintAccount,
+        tokenMint: mintAuthority,
         payer: this.program.provider.wallet.publicKey,
         unusedClock: SYSVAR_CLOCK_PUBKEY,
         systemProgram: SystemProgram.programId,

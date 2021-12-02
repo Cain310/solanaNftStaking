@@ -155,7 +155,8 @@ export class QuarryWrapper {
       authority,
       miner,
       tokenVaultKey,
-      stakedTokenATA
+      stakedTokenATA,
+      nonFungibleMint // not declared
     );
   }
 
@@ -171,14 +172,16 @@ export class QuarryWrapper {
     authority: PublicKey,
     minerKey: PublicKey,
     tokenVaultKey: PublicKey,
-    stakedTokenATA: PublicKey
+    stakedTokenATA: PublicKey,
+    nonFungibleMint: PublicKey
   ): MinerWrapper {
     return new MinerWrapper(
       this,
       authority,
       minerKey,
       tokenVaultKey,
-      stakedTokenATA
+      stakedTokenATA,
+      nonFungibleMint
     );
   }
 
@@ -246,7 +249,8 @@ export class QuarryWrapper {
       authority,
       miner,
       minerVault,
-      stakedTokenATA
+      stakedTokenATA,
+      nonFungibleMint
     );
     const result = wrapper.initialize(nonFungibleMint, bump);
     if (createATATX) {

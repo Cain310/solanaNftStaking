@@ -159,7 +159,6 @@ mod tests {
         let quarry = &mut Quarry::default();
         quarry.famine_ts = i64::MAX;
         quarry.rewards_share = 100;
-         quarry.token_mint_decimals = DEFAULT_TOKEN_DECIMALS;
         let miner_vault = &mut MinerVault { balance: 0 };
 
         let daily_rewards_rate = to_unit(5_000);
@@ -260,7 +259,6 @@ mod tests {
         let quarry = &mut Quarry::default();
         quarry.famine_ts = i64::MAX;
         quarry.rewards_share = 100;
-         quarry.token_mint_decimals = DEFAULT_TOKEN_DECIMALS;
         let miner_vault_one = &mut MinerVault { balance: 0 };
         let miner_vault_two = &mut MinerVault { balance: 0 };
 

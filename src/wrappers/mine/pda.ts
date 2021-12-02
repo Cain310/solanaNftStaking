@@ -15,19 +15,20 @@ export const findRewarderAddress = async (
 
 export const findQuarryAddress = async (
   rewarder: PublicKey,
-  tokenMint: PublicKey,
-  programID: PublicKey = QUARRY_ADDRESSES.Mine,
-  nftMintUpdateAuthority?: PublicKey | undefined
+  updateAuthority: PublicKey,
+  programID: PublicKey = QUARRY_ADDRESSES.Mine
+  // nftMintUpdateAuthority?: PublicKey | undefined
 ): Promise<[PublicKey, number]> => {
-  console.log("nftMintUpdateAuthority", nftMintUpdateAuthority);
-  const mint = nftMintUpdateAuthority ? nftMintUpdateAuthority : tokenMint;
-  console.log("mint", mint);
+  // console.log("nftMintUpdateAuthority", nftMintUpdateAuthority);
+  // const mint = nftMintUpdateAuthority ? nftMintUpdateAuthority : tokenMint;
+  // console.log("mint", mint);
   return await PublicKey.findProgramAddress(
     [
       Buffer.from(utils.bytes.utf8.encode("Quarry")),
       rewarder.toBytes(),
+      updateAuthority.toBytes(),
       // updateAuthority.toBytes(),
-      mint.toBytes(),
+      // mint.toBytes(),
     ],
     programID
   );
@@ -36,18 +37,16 @@ export const findQuarryAddress = async (
 export const findMinerAddress = async (
   quarry: PublicKey,
   authority: PublicKey,
-  nonFungibleMint?: PublicKey,
-  // token_mint_key: PublicKey, idk maybe add this
+  tokenMint?: PublicKey, // changed from `token_mint_key: PublicKey,`
   programID: PublicKey = QUARRY_ADDRESSES.Mine
 ): Promise<[PublicKey, number]> => {
-  // ?? fix this
-  if (nonFungibleMint) {
+  if (tokenMint) {
     return await PublicKey.findProgramAddress(
       [
         Buffer.from(utils.bytes.utf8.encode("Miner")),
         quarry.toBytes(),
         authority.toBytes(),
-        nonFungibleMint.toBytes(),
+        tokenMint.toBytes(),
       ],
       programID
     );

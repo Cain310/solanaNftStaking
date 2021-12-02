@@ -53,6 +53,7 @@ describe("Mine Rewards", () => {
   let stakeNonfungibleToken: Token;
   let nonFungibleMintAnother: Keypair;
   let freezeAuthority: PublicKey;
+  let mintAuthority: PublicKey;
 
   // let stakedMintAuthority: anchor.web3.Keypair;
   // let stakeTokenMint: anchor.web3.PublicKey;
@@ -76,12 +77,16 @@ describe("Mine Rewards", () => {
   before("Create nonfunigble token", async () => {
     await assert.doesNotReject(async () => {
       nonFungibleMint = web3.Keypair.generate();
+      mintAuthority = nonFungibleMint.publicKey;
       const tx = await mintNFT(provider, nonFungibleMint);
       // Generate a new random keypair
       await tx.send();
       await tx.confirm();
       stakeNonfungibleToken = Token.fromMint(nonFungibleMint.publicKey, 0);
-      // console.log(stakeNonfungibleToken.toString());
+      console.log(
+        "stakeNonfungibleToken mineRewardeer",
+        stakeNonfungibleToken.toString()
+      );
 
       nonFungibleMintAnother = web3.Keypair.generate();
       const tx2 = await mintNFT(provider, nonFungibleMintAnother);
@@ -154,7 +159,7 @@ describe("Mine Rewards", () => {
     await expectTX(setAnnualRewardsTX).eventually.to.be.fulfilled;
 
     const { tx: createQuarryTX } = await rewarderWrapper.createQuarry({
-      stakeNonfungibleToken,
+      mintAuthority,
     });
     await expectTX(createQuarryTX, "create quarry for stake token").to.be
       .fulfilled;

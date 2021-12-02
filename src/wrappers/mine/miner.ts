@@ -33,7 +33,8 @@ export class MinerWrapper {
     public readonly authority: PublicKey,
     public readonly minerKey: PublicKey,
     public readonly tokenVaultKey: PublicKey,
-    public readonly stakedTokenATA: PublicKey
+    public readonly stakedTokenATA: PublicKey,
+    public readonly nonFungibleMint: PublicKey // added tokenMint to MineWrapper, referenced in quarry.ts:172
   ) {}
 
   /**
