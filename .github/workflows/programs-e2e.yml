@@ -33,7 +33,7 @@ jobs:
         run: nix shell .#ci --command ./scripts/parse-idls.sh
 
       - name: Setup Node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           always-auth: true
           node-version: "16"
@@ -104,7 +104,7 @@ jobs:
           path: ./.yarn
           key: ${{ runner.os }}-${{ hashFiles('./.yarn/**/*.js') }}
       - name: Setup Node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: "16"
       - run: yarn install
