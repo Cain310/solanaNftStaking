@@ -99,22 +99,102 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metaplex/js@npm:^4.4.1":
-  version: 4.4.2
-  resolution: "@metaplex/js@npm:4.4.2"
+"@metaplex-foundation/mpl-auction@npm:^0.0.2":
+  version: 0.0.2
+  resolution: "@metaplex-foundation/mpl-auction@npm:0.0.2"
   dependencies:
+    "@metaplex-foundation/mpl-core": ^0.0.2
+    "@solana/spl-token": ^0.1.8
+    "@solana/web3.js": ^1.31.0
+  checksum: bb8844835a6fc4313c77ea744c7a1feaa732c134098433d34f37ef5de76ea7717a710d03d6b4bdb3ab33a25b31b081ec1a6e54cef8c669c4cf0ae6208334e960
+  languageName: node
+  linkType: hard
+
+"@metaplex-foundation/mpl-core@npm:^0.0.2":
+  version: 0.0.2
+  resolution: "@metaplex-foundation/mpl-core@npm:0.0.2"
+  dependencies:
+    "@solana/web3.js": ^1.31.0
+    bs58: ^4.0.1
+  checksum: f74ad09538dbd8b567c349724310ed3ca1e3c9d7e65992ea32077294b09791cd246ab2ac0c29c0a8ed00aaccb6858dbb0fffc55e7e788da7c418f2ed094a1d9a
+  languageName: node
+  linkType: hard
+
+"@metaplex-foundation/mpl-metaplex@npm:^0.0.5":
+  version: 0.0.5
+  resolution: "@metaplex-foundation/mpl-metaplex@npm:0.0.5"
+  dependencies:
+    "@metaplex-foundation/mpl-auction": ^0.0.2
+    "@metaplex-foundation/mpl-core": ^0.0.2
+    "@metaplex-foundation/mpl-token-metadata": ^0.0.2
+    "@metaplex-foundation/mpl-token-vault": ^0.0.2
+    "@solana/spl-token": ^0.1.8
+    "@solana/web3.js": ^1.31.0
+  checksum: 749be4932dcfe3f5c48cc1ac194e1ee92ee92f01359699d53abf755937ab3e10026a06c68ae76924bfb4828ae24c8f378ea9fffabe98a39df353289cd6e5c3d6
+  languageName: node
+  linkType: hard
+
+"@metaplex-foundation/mpl-token-metadata@npm:^0.0.2":
+  version: 0.0.2
+  resolution: "@metaplex-foundation/mpl-token-metadata@npm:0.0.2"
+  dependencies:
+    "@metaplex-foundation/mpl-core": ^0.0.2
+    "@solana/spl-token": ^0.1.8
+    "@solana/web3.js": ^1.31.0
+  checksum: 03064927d289cd3de12b238c233cb06ce7476338b7bf203e5c02828048d0e51c438ba90c9151d24c379618270cfcd05cee327ca9dc7b100d1108c4301ad3388b
+  languageName: node
+  linkType: hard
+
+"@metaplex-foundation/mpl-token-metadata@npm:^1.1.0":
+  version: 1.2.5
+  resolution: "@metaplex-foundation/mpl-token-metadata@npm:1.2.5"
+  dependencies:
+    "@metaplex-foundation/mpl-core": ^0.0.2
+    "@solana/spl-token": ^0.1.8
+    "@solana/web3.js": ^1.31.0
+  checksum: 89037642dfbb2ee465e6976dd0430188eee77db6f6266e70f037abc0d8672e12f8aca47fc78ce13c20bd2832ea126c88aff599915333ed0c96e6e88e0baa9db4
+  languageName: node
+  linkType: hard
+
+"@metaplex-foundation/mpl-token-vault@npm:^0.0.2":
+  version: 0.0.2
+  resolution: "@metaplex-foundation/mpl-token-vault@npm:0.0.2"
+  dependencies:
+    "@metaplex-foundation/mpl-core": ^0.0.2
+    "@solana/spl-token": ^0.1.8
+    "@solana/web3.js": ^1.31.0
+  checksum: 4543fc4142f59f447a19b26162d22c8547cb9b94cf2cc386f0d33db85fb06777d19d34792f7d63e0a9f4bb5549b2819e1f1b9cc2420af5effcdb84799dfe6616
+  languageName: node
+  linkType: hard
+
+"@metaplex/js@npm:^4.4.1":
+  version: 4.12.0
+  resolution: "@metaplex/js@npm:4.12.0"
+  dependencies:
+    "@metaplex-foundation/mpl-auction": ^0.0.2
+    "@metaplex-foundation/mpl-core": ^0.0.2
+    "@metaplex-foundation/mpl-metaplex": ^0.0.5
+    "@metaplex-foundation/mpl-token-metadata": ^1.1.0
+    "@metaplex-foundation/mpl-token-vault": ^0.0.2
     "@solana/spl-token": ^0.1.8
     "@solana/web3.js": ^1.30.2
     "@types/bs58": ^4.0.1
-    async-retry: ^1.3.3
-    axios: ^0.21.4
+    axios: ^0.25.0
     bn.js: ^5.2.0
     borsh: ^0.4.0
     bs58: ^4.0.1
     buffer: ^6.0.3
     crypto-hash: ^1.3.0
     form-data: ^4.0.0
-  checksum: e433e99abe0a6c8b5f670df97f36bc3a594385e802e3371bc9c9f2b0b19a7f271a27f57e2aca26a3017604dadc2cda30f713996dff41823616726c7fcbcd2bae
+  peerDependencies:
+    "@metaplex-foundation/mpl-auction": ^0.0.2
+    "@metaplex-foundation/mpl-core": ^0.0.2
+    "@metaplex-foundation/mpl-metaplex": ^0.0.5
+    "@metaplex-foundation/mpl-token-metadata": ^0.0.2
+    "@metaplex-foundation/mpl-token-vault": ^0.0.2
+    "@solana/spl-token": ^0.1.8
+    "@solana/web3.js": ^1.30.2
+  checksum: b712095f3e33684e873d804bed72f0d1760c623361362e22bce1b206b3ca262dfbcd68f69249a4199315ff5d24c0ab6831b0d550b9055de6f97da4ac4c125ba0
   languageName: node
   linkType: hard
 
@@ -927,15 +1007,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"async-retry@npm:^1.3.3":
-  version: 1.3.3
-  resolution: "async-retry@npm:1.3.3"
-  dependencies:
-    retry: 0.13.1
-  checksum: 38a7152ff7265a9321ea214b9c69e8224ab1febbdec98efbbde6e562f17ff68405569b796b1c5271f354aef8783665d29953f051f68c1fc45306e61aec82fdc4
-  languageName: node
-  linkType: hard
-
 "asynckit@npm:^0.4.0":
   version: 0.4.0
   resolution: "asynckit@npm:0.4.0"
@@ -943,12 +1014,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^0.21.4":
-  version: 0.21.4
-  resolution: "axios@npm:0.21.4"
+"axios@npm:^0.25.0":
+  version: 0.25.0
+  resolution: "axios@npm:0.25.0"
   dependencies:
-    follow-redirects: ^1.14.0
-  checksum: 44245f24ac971e7458f3120c92f9d66d1fc695e8b97019139de5b0cc65d9b8104647db01e5f46917728edfc0cfd88eb30fc4c55e6053eef4ace76768ce95ff3c
+    follow-redirects: ^1.14.7
+  checksum: 2a8a3787c05f2a0c9c3878f49782357e2a9f38945b93018fb0c4fd788171c43dceefbb577988628e09fea53952744d1ecebde234b561f1e703aa43e0a598a3ad
   languageName: node
   linkType: hard
 
@@ -2082,13 +2153,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.14.0":
-  version: 1.14.5
-  resolution: "follow-redirects@npm:1.14.5"
+"follow-redirects@npm:^1.14.7":
+  version: 1.15.2
+  resolution: "follow-redirects@npm:1.15.2"
   peerDependenciesMeta:
     debug:
       optional: true
-  checksum: f004a76b2ee3a849772c2816e30928253bf47537b0f00184d89f4966413add96a228a4d96ca8c702bc045a683c52c2ba41545c915cc1a5e33bf8fd9d07b59aee
+  checksum: faa66059b66358ba65c234c2f2a37fcec029dc22775f35d9ad6abac56003268baf41e55f9ee645957b32c7d9f62baf1f0b906e68267276f54ec4b4c597c2b190
   languageName: node
   linkType: hard
 
@@ -3695,17 +3766,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"retry@npm:0.13.1, retry@npm:^0.13.1":
-  version: 0.13.1
-  resolution: "retry@npm:0.13.1"
-  checksum: 47c4d5be674f7c13eee4cfe927345023972197dbbdfba5d3af7e461d13b44de1bfd663bfc80d2f601f8ef3fc8164c16dd99655a221921954a65d044a2fc1233b
-  languageName: node
-  linkType: hard
-
 "retry@npm:^0.12.0":
   version: 0.12.0
   resolution: "retry@npm:0.12.0"
   checksum: 623bd7d2e5119467ba66202d733ec3c2e2e26568074923bc0585b6b99db14f357e79bdedb63cab56cec47491c4a0da7e6021a7465ca6dc4f481d3898fdd3158c
+  languageName: node
+  linkType: hard
+
+"retry@npm:^0.13.1":
+  version: 0.13.1
+  resolution: "retry@npm:0.13.1"
+  checksum: 47c4d5be674f7c13eee4cfe927345023972197dbbdfba5d3af7e461d13b44de1bfd663bfc80d2f601f8ef3fc8164c16dd99655a221921954a65d044a2fc1233b
   languageName: node
   linkType: hard
 
